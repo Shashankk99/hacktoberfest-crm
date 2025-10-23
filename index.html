@@ -1,12 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacktoberfest CRM</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 1em;
+            max-width: 600px;
+        }
+
+        .highlight {
+            color: #ffdd57;
+            font-weight: bold;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2em;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            p {
+                font-size: 1em;
+                padding: 0 1em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Hacktoberfest CRM</h1>
-    <p>This is a simple CRM application built with Flask for Hacktoberfest 2025.</p>
-    <p>Shashankk is smart.</p>
+    <div class="card">
+        <h1>Welcome to Hacktoberfest CRM</h1>
+        <p>This is a simple CRM application built with Flask for <span class="highlight">Hacktoberfest 2025</span>.</p>
+        <p><span class="highlight">Shashankk</span> is smart.</p>
+    </div>
 </body>
 </html>
+
