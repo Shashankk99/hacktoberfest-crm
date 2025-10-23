@@ -1,103 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Hacktoberfest 2025</title>
-    <style>
-        /* Basic reset */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+<!DOCTYPE html> <!-- tells the browser this is an HTML5 document -->
+<html lang="en"> <!-- starts the HTML and says language is English -->
+<head> <!-- this is where page settings go -->
+    <meta charset="UTF-8"> <!-- ensures text displays correctly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- makes it mobile-friendly -->
+    <title>Tic Tac Toe - Pink & Hearts Edition</title> <!-- title seen on browser tab -->
+    <style> /* start of CSS that changes how things look */
+
+        * { /* reset spaces and set default font */
+            box-sizing: border-box; /* layout safety */
+            margin: 0; /* remove default margin */
+            padding: 0; /* remove default padding */
+            font-family: 'Segoe UI', Tahoma, sans-serif; /* clean modern font */
         }
 
-        body {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
+        body { /* main background styling */
+            background: #ffb6d9; /* soft pink background */
+            color: #fff; /* white text */
+            display: flex; /* flexbox to center everything */
+            flex-direction: column; /* stack elements vertically */
+            justify-content: center; /* center vertically */
+            align-items: center; /* center horizontally */
+            min-height: 100vh; /* full screen height */
+            text-align: center; /* center text */
+            padding: 2em; /* breathing room */
+        }
+
+        h1 { /* title styling */
+            font-size: 3em; /* make it big */
+            margin-bottom: 0.5em; /* space below */
+            color: #ff2e8e; /* hot pink */
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.3); /* glow effect */
+        }
+
+        .game-container { /* tic tac toe grid */
+            display: grid; /* CSS grid layout */
+            grid-template-columns: repeat(3, 110px); /* 3 columns */
+            grid-template-rows: repeat(3, 110px); /* 3 rows */
+            gap: 12px; /* space between cells */
+            margin-top: 2em; /* push down from title */
+        }
+
+        .cell { /* individual square */
+            background: #ff7bbf; /* cute pink */
+            display: flex; /* center content */
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 2em;
+            font-size: 3em; /* big X or heart */
+            cursor: pointer; /* clickable hand icon */
+            border-radius: 20px; /* rounded corners */
+            transition: background 0.3s, transform 0.2s; /* animations */
         }
 
-        h1 {
-            font-size: 3em;
-            margin-bottom: 0.5em;
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+        .cell:hover { /* hover effect */
+            background: #ff4aa4; /* slightly darker pink */
+            transform: scale(1.05); /* small zoom */
         }
 
-        .game-container {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
-            margin-top: 2em;
+        #status { /* text above reset button */
+            margin-top: 2em; /* spacing */
+            font-size: 1.5em; /* little bigger */
+            color: #ffffff; /* white text */
         }
 
-        .cell {
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5em;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: background 0.3s, transform 0.2s;
+        button { /* reset button styling */
+            margin-top: 1.5em; /* spacing above */
+            padding: 0.8em 1.5em; /* size of button */
+            font-size: 1em; /* normal size */
+            font-weight: bold; /* bolder text */
+            border: none; /* remove border */
+            border-radius: 15px; /* rounded */
+            cursor: pointer; /* clickable hand cursor */
+            background-color: #ff2e8e; /* bright pink */
+            color: #fff; /* white text */
+            transition: transform 0.2s; /* animation */
         }
 
-        .cell:hover {
-            background: rgba(255, 255, 255, 0.25);
+        button:hover { /* button hover glow */
             transform: scale(1.05);
         }
 
-        #status {
-            margin-top: 2em;
-            font-size: 1.5em;
-        }
-
-        button {
-            margin-top: 1.5em;
-            padding: 0.8em 1.5em;
-            font-size: 1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            background-color: #ffdd57;
-            color: #000;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button:hover {
-            background-color: #ffd700;
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 500px) {
-            .game-container {
-                grid-template-columns: repeat(3, 70px);
-                grid-template-rows: repeat(3, 70px);
-                gap: 8px;
-            }
-
-            .cell {
-                font-size: 2em;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-        }
-    </style>
+    </style> <!-- end of CSS -->
 </head>
-<body>
-    <h1>Tic Tac Toe</h1>
-    <div class="game-container" id="board">
+<body> <!-- start of visible page content -->
+
+    <h1>Tic Tac Toe ♥</h1> <!-- title on screen -->
+
+    <div class="game-container" id="board"> <!-- TIC TAC TOE grid wrapper -->
+        <!-- each of the 9 squares with unique data-index -->
         <div class="cell" data-index="0"></div>
         <div class="cell" data-index="1"></div>
         <div class="cell" data-index="2"></div>
@@ -108,69 +97,76 @@
         <div class="cell" data-index="7"></div>
         <div class="cell" data-index="8"></div>
     </div>
-    <div id="status">Player X's turn</div>
-    <button id="reset">Restart Game</button>
 
-    <script>
-        const board = Array(9).fill(null);
-        let currentPlayer = 'X';
-        let gameActive = true;
+    <div id="status">Player X's turn</div> <!-- shows whose turn -->
 
-        const winningCombos = [
+    <button id="reset">Restart Game</button> <!-- reset button -->
+
+    <script> /* start of JAVASCRIPT = the brain of the game */
+
+        const board = Array(9).fill(null); // stores the 9 cells (X, heart, or empty)
+        let currentPlayer = 'X'; // starting player
+        let gameActive = true; // stops the game when win happens
+
+        const winningCombos = [ // all 8 ways to win
             [0,1,2], [3,4,5], [6,7,8], // rows
             [0,3,6], [1,4,7], [2,5,8], // columns
             [0,4,8], [2,4,6]           // diagonals
         ];
 
-        const cells = document.querySelectorAll('.cell');
-        const statusText = document.getElementById('status');
-        const resetButton = document.getElementById('reset');
+        const cells = document.querySelectorAll('.cell'); // gets all 9 squares
+        const statusText = document.getElementById('status'); // text display area
+        const resetButton = document.getElementById('reset'); // reset button
 
-        function handleCellClick(e) {
-            const index = e.target.getAttribute('data-index');
-            if (board[index] || !gameActive) return;
+        function handleCellClick(e) { // runs when clicking a square
+            const index = e.target.getAttribute('data-index'); // get square number
+            if (board[index] || !gameActive) return; // if used or game over, ignore
 
-            board[index] = currentPlayer;
-            e.target.textContent = currentPlayer;
-            checkResult();
+            // use ♥ (heart emoji) for player O
+            board[index] = currentPlayer === 'X' ? 'X' : '♥';
+            e.target.textContent = board[index]; // show on screen
+            checkResult(); // check win or draw
         }
 
-        function checkResult() {
-            let roundWon = false;
-            for (let combo of winningCombos) {
-                const [a, b, c] = combo;
+        function checkResult() { // checks if someone won
+            let roundWon = false; // assumption
+
+            for (let combo of winningCombos) { // loop each win pattern
+                const [a, b, c] = combo; // destructure indexes
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    roundWon = true;
-                    break;
+                    roundWon = true; // win detected
+                    break; // stop checking more
                 }
             }
 
-            if (roundWon) {
-                statusText.textContent = `Player ${currentPlayer} wins! 🎉`;
-                gameActive = false;
-                return;
+            if (roundWon) { // if we found a win
+                statusText.textContent = `Player ${currentPlayer} wins! 💖`; // announce
+                gameActive = false; // stop game
+                return; // exit function
             }
 
-            if (!board.includes(null)) {
-                statusText.textContent = "It's a draw! 🤝";
-                gameActive = false;
-                return;
+            if (!board.includes(null)) { // no empty cells = draw
+                statusText.textContent = "It's a draw! 🤝"; // announce draw
+                gameActive = false; // stop game
+                return; // exit
             }
 
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusText.textContent = `Player ${currentPlayer}'s turn`;
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // switch player
+            statusText.textContent = `Player ${currentPlayer}'s turn`; // update UI
         }
 
-        function resetGame() {
-            board.fill(null);
-            cells.forEach(cell => cell.textContent = '');
-            currentPlayer = 'X';
-            gameActive = true;
-            statusText.textContent = `Player ${currentPlayer}'s turn`;
+        function resetGame() { // when clicking reset
+            board.fill(null); // clear all memory
+            cells.forEach(cell => cell.textContent = ''); // clear screen
+            currentPlayer = 'X'; // back to X
+            gameActive = true; // game on again
+            statusText.textContent = `Player ${currentPlayer}'s turn`; // update UI
         }
 
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-        resetButton.addEventListener('click', resetGame);
-    </script>
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick)); // listen for clicks
+        resetButton.addEventListener('click', resetGame); // listen for reset click
+
+    </script> <!-- end of JavaScript -->
+
 </body>
 </html>
