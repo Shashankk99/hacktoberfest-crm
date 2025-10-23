@@ -3,64 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacktoberfest CRM</title>
+    <title>Tic Tac Toe - Hacktoberfest 2025</title>
     <style>
-        /* Reset default styles */
-        body, h1, p {
+        /* Basic reset */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: #fff;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
-            padding: 1em;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2em 3em;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            max-width: 600px;
-            width: 100%;
+            padding: 2em;
         }
 
         h1 {
-            font-size: 2.8em;
+            font-size: 3em;
             margin-bottom: 0.5em;
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
         }
 
-        p {
-            font-size: 1.2em;
-            margin-bottom: 1em;
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin-top: 2em;
         }
 
-        .highlight {
-            color: #ffdd57;
-            font-weight: bold;
+        .cell {
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5em;
             cursor: pointer;
-            transition: color 0.3s ease;
+            border-radius: 10px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        #status {
+            margin-top: 2em;
+            font-size: 1.5em;
         }
 
         button {
-            background-color: #ffdd57;
-            border: none;
+            margin-top: 1.5em;
             padding: 0.8em 1.5em;
-            border-radius: 10px;
             font-size: 1em;
             font-weight: bold;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 1em;
+            background-color: #ffdd57;
+            color: #000;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
         button:hover {
@@ -68,62 +78,99 @@
             transform: scale(1.05);
         }
 
-        @media (max-width: 600px) {
-            h1 {
+        @media (max-width: 500px) {
+            .game-container {
+                grid-template-columns: repeat(3, 70px);
+                grid-template-rows: repeat(3, 70px);
+                gap: 8px;
+            }
+
+            .cell {
                 font-size: 2em;
             }
 
-            p {
-                font-size: 1em;
-            }
-
-            .card {
-                padding: 1.5em 2em;
+            h1 {
+                font-size: 2em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Welcome to Hacktoberfest CRM</h1>
-        <p>This is a simple CRM application built with Flask for <span class="highlight">Hacktoberfest 2025</span>.</p>
-        <p><span class="highlight">Shashankk</span> is smart.</p>
-        <button id="actionButton">Click Me!</button>
+    <h1>Tic Tac Toe</h1>
+    <div class="game-container" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
     </div>
+    <div id="status">Player X's turn</div>
+    <button id="reset">Restart Game</button>
 
     <script>
-        // Log a message when the page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('Hacktoberfest CRM Loaded');
-        });
+        const board = Array(9).fill(null);
+        let currentPlayer = 'X';
+        let gameActive = true;
 
-        // Change highlight color on click
-        const highlightElements = document.querySelectorAll('.highlight');
-        highlightElements.forEach(el => {
-            el.addEventListener('click', () => {
-                el.style.color = el.style.color === 'cyan' ? '#ffdd57' : 'cyan';
-            });
-        });
+        const winningCombos = [
+            [0,1,2], [3,4,5], [6,7,8], // rows
+            [0,3,6], [1,4,7], [2,5,8], // columns
+            [0,4,8], [2,4,6]           // diagonals
+        ];
 
-        // Dynamic greeting based on time
-        const card = document.querySelector('.card');
-        if(card){
-            const hour = new Date().getHours();
-            let greeting = 'Hello';
-            if(hour < 12) greeting = 'Good Morning';
-            else if(hour < 18) greeting = 'Good Afternoon';
-            else greeting = 'Good Evening';
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.getElementById('status');
+        const resetButton = document.getElementById('reset');
 
-            const greetingElement = document.createElement('p');
-            greetingElement.textContent = `${greeting}! Welcome to Hacktoberfest CRM.`;
-            card.prepend(greetingElement);
+        function handleCellClick(e) {
+            const index = e.target.getAttribute('data-index');
+            if (board[index] || !gameActive) return;
+
+            board[index] = currentPlayer;
+            e.target.textContent = currentPlayer;
+            checkResult();
         }
 
-        // Button click interactivity
-        const button = document.getElementById('actionButton');
-        button.addEventListener('click', () => {
-            alert('You clicked the Hacktoberfest button! 🎉');
-        });
+        function checkResult() {
+            let roundWon = false;
+            for (let combo of winningCombos) {
+                const [a, b, c] = combo;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusText.textContent = `Player ${currentPlayer} wins! 🎉`;
+                gameActive = false;
+                return;
+            }
+
+            if (!board.includes(null)) {
+                statusText.textContent = "It's a draw! 🤝";
+                gameActive = false;
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusText.textContent = `Player ${currentPlayer}'s turn`;
+        }
+
+        function resetGame() {
+            board.fill(null);
+            cells.forEach(cell => cell.textContent = '');
+            currentPlayer = 'X';
+            gameActive = true;
+            statusText.textContent = `Player ${currentPlayer}'s turn`;
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetButton.addEventListener('click', resetGame);
     </script>
 </body>
 </html>
