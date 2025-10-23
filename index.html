@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hacktoberfest CRM</title>
     <style>
-        /* Reset some default styles */
+        /* Reset default styles */
         body, h1, p {
             margin: 0;
             padding: 0;
@@ -16,36 +16,56 @@
             background: linear-gradient(to right, #6a11cb, #2575fc);
             color: #fff;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
+            padding: 1em;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2em 3em;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 100%;
         }
 
         h1 {
-            font-size: 3em;
+            font-size: 2.8em;
             margin-bottom: 0.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
         }
 
         p {
             font-size: 1.2em;
             margin-bottom: 1em;
-            max-width: 600px;
         }
 
         .highlight {
             color: #ffdd57;
             font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2em;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+        button {
+            background-color: #ffdd57;
+            border: none;
+            padding: 0.8em 1.5em;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 1em;
+        }
+
+        button:hover {
+            background-color: #ffd700;
+            transform: scale(1.05);
         }
 
         @media (max-width: 600px) {
@@ -55,7 +75,10 @@
 
             p {
                 font-size: 1em;
-                padding: 0 1em;
+            }
+
+            .card {
+                padding: 1.5em 2em;
             }
         }
     </style>
@@ -65,7 +88,42 @@
         <h1>Welcome to Hacktoberfest CRM</h1>
         <p>This is a simple CRM application built with Flask for <span class="highlight">Hacktoberfest 2025</span>.</p>
         <p><span class="highlight">Shashankk</span> is smart.</p>
+        <button id="actionButton">Click Me!</button>
     </div>
+
+    <script>
+        // Log a message when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Hacktoberfest CRM Loaded');
+        });
+
+        // Change highlight color on click
+        const highlightElements = document.querySelectorAll('.highlight');
+        highlightElements.forEach(el => {
+            el.addEventListener('click', () => {
+                el.style.color = el.style.color === 'cyan' ? '#ffdd57' : 'cyan';
+            });
+        });
+
+        // Dynamic greeting based on time
+        const card = document.querySelector('.card');
+        if(card){
+            const hour = new Date().getHours();
+            let greeting = 'Hello';
+            if(hour < 12) greeting = 'Good Morning';
+            else if(hour < 18) greeting = 'Good Afternoon';
+            else greeting = 'Good Evening';
+
+            const greetingElement = document.createElement('p');
+            greetingElement.textContent = `${greeting}! Welcome to Hacktoberfest CRM.`;
+            card.prepend(greetingElement);
+        }
+
+        // Button click interactivity
+        const button = document.getElementById('actionButton');
+        button.addEventListener('click', () => {
+            alert('You clicked the Hacktoberfest button! 🎉');
+        });
+    </script>
 </body>
 </html>
-
