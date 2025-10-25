@@ -1,194 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tic Tac Toe – Custom Play</title>
-  <style>
-    *{
-      box-sizing:border-box;
-      margin:0; padding:0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-    }
+  <title>Tic Tac Toe – Glow Edition</title>
 
-    body{
-      --bg:#ffb6d9;
-      --hot:#ff2e8e;
+  <!-- Friendly rounded font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-1:#defaf0;   /* base mint */
+      --bg-2:#f8e9ff;   /* lilac wash */
+      --hot:#ff2e8e;    /* brand pink */
+      --text:#19202c;
       --tile:#ff7bbf;
       --tile-hover:#ff4aa4;
-      background: var(--bg);
-      color:#fff;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-      gap:1.25rem;
-      padding:2rem 1rem 3rem;
-      transition: background .2s ease;
+      --panel:rgba(255,255,255,.55);
+      --panel-stroke:rgba(255,255,255,.7);
+      --shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      /* layered gradient + subtle dots */
+      background:
+        radial-gradient(24px 24px at 20% 15%, rgba(255,255,255,.7) 0 25%, transparent 26%) 0 0 / 48px 48px,
+        linear-gradient(140deg, var(--bg-1), var(--bg-2));
+      display:flex; flex-direction:column; align-items:center;
+      padding: 24px 16px 56px;
+      overflow-x:hidden;
     }
 
     h1{
-      font-size: clamp(2rem, 4vw, 3rem);
       color: var(--hot);
-      text-shadow: 2px 2px 6px rgba(0,0,0,.3);
-    }
-
-    /* Control Panel */
-    .panel{
-      width:min(900px, 100%);
-      background: rgba(255,255,255,.15);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: 18px;
-      padding: 1rem;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: .75rem;
-    }
-    @media (min-width: 720px){
-      .panel{
-        grid-template-columns: 1fr 1fr 1fr;
-        align-items: end;
-      }
-    }
-
-    .group{
-      background: rgba(0,0,0,.08);
-      border-radius: 14px;
-      padding: .9rem;
-      display:flex;
-      flex-direction:column;
-      gap:.5rem;
-    }
-
-    .group h3{
-      font-size: .95rem;
-      font-weight: 700;
-      color:#fff;
-      opacity:.95;
+      font-size: clamp(2.2rem, 4.8vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing:.5px;
+      text-shadow: 0 6px 20px rgba(255,46,142,.35);
+      margin: 6px 0 18px;
       display:flex; align-items:center; gap:.5rem;
     }
 
-    .row{
-      display:flex;
-      gap:.5rem;
-      align-items:center;
-      flex-wrap:wrap;
+    /* ===== Panel (controls) ===== */
+    .panel{
+      width:min(980px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--panel-stroke);
+      backdrop-filter: blur(10px);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 860px){
+      .panel{ grid-template-columns: 1fr 1fr 1fr; align-items:end; }
     }
 
-    label{
-      font-size:.9rem;
+    .group{
+      background: rgba(255,255,255,.45);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .group h3{
+      margin: 0 0 8px;
+      font-size: .98rem;
+      font-weight: 800;
+      color: #344055;
       opacity:.9;
     }
 
-    input[type="text"], select{
-      width: 100%;
-      max-width: 240px;
-      background:#fff;
-      color:#333;
-      border:none;
-      border-radius: 12px;
-      padding:.6rem .8rem;
-      font-size:1rem;
-      outline:none;
-    }
-
-    .chipset{
-      display:flex; gap:.5rem; flex-wrap:wrap;
-    }
-    .chip{
-      background:#fff;
-      color:#333;
-      border:none;
-      border-radius: 999px;
-      padding:.35rem .7rem;
-      cursor:pointer;
-      font-size:1rem;
-      line-height:1;
-      transition: transform .1s ease;
-      user-select:none;
+    .chipset{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+    .chip, .chip.subtle{
+      border:none; cursor:pointer; user-select:none;
+      border-radius: 999px; padding: 10px 14px; line-height:1;
+      background:#ffffff; color:#243041; font-weight:600;
+      box-shadow: 0 2px 0 rgba(0,0,0,.06);
+      transition: transform .08s ease, box-shadow .2s ease, outline .2s ease;
     }
     .chip:hover{ transform: translateY(-1px); }
-    .chip.active{
-      outline: 2px solid var(--hot);
+    .chip.active{ outline: 2px solid var(--hot); }
+
+    .subtle{ background: rgba(255,255,255,.8); }
+
+    input[type="text"]{
+      width:100%; max-width: 280px;
+      border: 2px solid rgba(0,0,0,.06);
+      border-radius: 12px; padding: 10px 12px; font-size: 1rem;
+      background:#fff; color:#111;
     }
 
-    .color-row{
-      display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
-    }
+    .color-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     input[type="color"]{
-      width: 46px; height: 38px;
-      border:none; border-radius: 10px;
-      background:#fff; padding:0;
-      cursor:pointer;
+      width: 46px; height: 38px; border:none; border-radius: 10px; background:#fff; padding:0; cursor:pointer;
+      box-shadow: 0 2px 0 rgba(0,0,0,.06);
     }
 
     .apply{
       grid-column: 1 / -1;
-      display:flex; gap:.6rem; flex-wrap:wrap;
-      align-items:center; justify-content:flex-end;
+      display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;
     }
 
-    button{
-      padding:.8rem 1.2rem;
-      border:none; border-radius: 14px;
-      font-weight:700; cursor:pointer;
-      background: var(--hot); color:#fff;
-      transition: transform .15s ease;
+    button.btn{
+      padding: 12px 18px; border:none; border-radius: 14px; cursor:pointer;
+      font-weight:800; color:#fff; background: linear-gradient(180deg, #ff5cb3, var(--hot));
+      box-shadow: 0 10px 20px rgba(255,46,142,.35);
+      transition: transform .08s ease, box-shadow .2s ease;
     }
-    button:hover{ transform: translateY(-1px) scale(1.02); }
-
-    .subtle{
-      background: rgba(255,255,255,.25);
-      color:#222;
+    .btn:hover{ transform: translateY(-1px) scale(1.02); }
+    .btn.ghost{
+      background: #fff; color:#1f2836; box-shadow: 0 8px 20px rgba(0,0,0,.06);
     }
 
     .error{
-      color:#fff; background:#ff5f74;
-      border-radius:10px; padding:.4rem .6rem;
-      font-size:.9rem;
-      display:none;
+      display:none; background:#ff6b7a; color:#fff; padding:.45rem .6rem; border-radius:10px; font-weight:600;
     }
 
-    /* Board */
-    .game-container{
+    /* ===== Board ===== */
+    .stage{
+      position:relative;
+      margin: 26px 0 10px;
+      padding: 16px;
+      border-radius: 26px;
+    }
+
+    .game{
       display:grid;
-      grid-template-columns: repeat(3, min(28vw, 110px));
-      grid-template-rows: repeat(3, min(28vw, 110px));
-      gap:12px;
-      margin-top:.5rem;
+      grid-template-columns: repeat(3, clamp(90px, 16vw, 136px));
+      grid-template-rows: repeat(3, clamp(90px, 16vw, 136px));
+      gap: 16px;
+      place-items:center;
     }
 
     .cell{
-      background: var(--tile);
+      width:100%; height:100%;
+      background: linear-gradient(180deg, #ffc0e2, var(--tile));
+      border-radius: 22px;
       display:flex; align-items:center; justify-content:center;
-      font-size: clamp(2rem, 8vw, 3rem);
-      cursor:pointer;
-      border-radius:20px;
-      transition: background .2s, transform .12s;
-      user-select:none;
+      font-size: clamp(2rem, 6.8vw, 3.2rem);
+      color:#ffffff;
+      cursor:pointer; user-select:none; position:relative;
+      box-shadow:
+        inset 0 8px 14px rgba(255,255,255,.45),
+        inset 0 -8px 14px rgba(0,0,0,.08),
+        0 16px 30px rgba(255,46,142,.18);
+      transition: transform .12s ease, filter .18s ease, box-shadow .2s ease;
     }
-    .cell:hover{ background: var(--tile-hover); transform: scale(1.04); }
+    .cell:hover{ transform: translateY(-2px) scale(1.02); filter: saturate(1.07); }
+    .cell:active{ transform: translateY(0) scale(.99); }
 
-    #status{
-      margin-top: .75rem;
-      font-size: 1.25rem;
+    /* pop when placing symbol */
+    .placed{ animation: pop .18s ease-out; }
+    @keyframes pop{
+      0%{ transform: scale(.5); opacity:.2; }
+      100%{ transform: scale(1); opacity:1; }
+    }
+
+    /* winning flair */
+    .win{
+      box-shadow:
+        inset 0 10px 20px rgba(255,255,255,.55),
+        inset 0 -10px 18px rgba(0,0,0,.1),
+        0 0 0 3px rgba(255,255,255,.9),
+        0 10px 30px rgba(46, 255, 176, .35);
+      animation: glow 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes glow{
+      from{ filter: drop-shadow(0 4px 18px rgba(46,255,176,.25)); }
+      to{   filter: drop-shadow(0 8px 26px rgba(46,255,176,.45)); }
+    }
+
+    /* winning line overlay */
+    .strike{
+      position:absolute; left:0; top:0; right:0; bottom:0; pointer-events:none;
+    }
+    .strike::after{
+      content:"";
+      position:absolute;
+      left:50%; top:50%;
+      width:0; height:6px; border-radius:6px;
+      background: linear-gradient(90deg, #2effb0, #7af7ff);
+      box-shadow: 0 6px 18px rgba(0,0,0,.18);
+      transform: translate(-50%, -50%);
+      animation: draw .38s ease-out forwards;
+    }
+    @keyframes draw{ to{ width: calc(100% - 32px); } } /* accounts for board padding */
+
+    /* position helpers (we rotate the line) */
+    .strike.h0::after{ transform: translate(-50%, -166%) rotate(0deg); }
+    .strike.h1::after{ transform: translate(-50%, -6%) rotate(0deg); }
+    .strike.h2::after{ transform: translate(-50%, 154%) rotate(0deg); }
+    .strike.v0::after{ transform: translate(-166%, -50%) rotate(90deg); }
+    .strike.v1::after{ transform: translate(-6%, -50%) rotate(90deg); }
+    .strike.v2::after{ transform: translate(154%, -50%) rotate(90deg); }
+    .strike.d0::after{ transform: translate(-50%, -50%) rotate(45deg); }
+    .strike.d1::after{ transform: translate(-50%, -50%) rotate(-45deg); }
+
+    /* status pill with active player's glow */
+    .status{
+      margin-top: 10px;
+      font-weight:800;
+      font-size: clamp(1rem, 2.4vw, 1.25rem);
+      color:#12223a;
+      background:#ffffffcc;
+      border:1px solid rgba(255,255,255,.9);
+      border-radius: 999px;
+      padding: 10px 14px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
+    }
+    .status .badge{
+      margin-left:8px; padding: 6px 10px; border-radius: 999px; color:#fff; background: var(--hot);
+      box-shadow: 0 6px 16px rgba(255,46,142,.35);
+    }
+
+    /* confetti container */
+    .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+    .piece{
+      position:absolute; top:-10px; font-size: 20px; animation: fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(360deg); opacity:.9; }
     }
   </style>
 </head>
 <body>
+  <h1>Tic Tac Toe <span aria-hidden="true">♥</span></h1>
 
-  <h1>Tic Tac Toe ♥</h1>
-
-  <!-- Control Panel -->
-  <section class="panel" id="controlPanel" aria-label="Control Panel">
-    <!-- Player 1 -->
-    <div class="group" id="p1Group">
+  <!-- ===== Control Panel ===== -->
+  <section class="panel" aria-label="Control Panel">
+    <div class="group">
       <h3>Player 1 Symbol</h3>
-      <div class="row">
-        <label for="p1Input">Pick ANY emoji/character, or tap a chip:</label>
-      </div>
       <div class="chipset" data-target="p1Input">
         <button class="chip">😄</button>
         <button class="chip">🐱</button>
@@ -196,15 +245,11 @@
         <button class="chip">⭐</button>
         <button class="chip">X</button>
       </div>
-      <input id="p1Input" type="text" maxlength="2" value="😄" aria-label="Player 1 Symbol"/>
+      <input id="p1Input" type="text" maxlength="2" value="😄" aria-label="Player 1 Symbol">
     </div>
 
-    <!-- Player 2 -->
-    <div class="group" id="p2Group">
+    <div class="group">
       <h3>Player 2 Symbol</h3>
-      <div class="row">
-        <label for="p2Input">Pick ANY emoji/character, or tap a chip:</label>
-      </div>
       <div class="chipset" data-target="p2Input">
         <button class="chip">♥</button>
         <button class="chip">🐶</button>
@@ -212,52 +257,53 @@
         <button class="chip">🌙</button>
         <button class="chip">O</button>
       </div>
-      <input id="p2Input" type="text" maxlength="2" value="♥" aria-label="Player 2 Symbol"/>
+      <input id="p2Input" type="text" maxlength="2" value="♥" aria-label="Player 2 Symbol">
     </div>
 
-    <!-- Background -->
     <div class="group">
       <h3>Background</h3>
       <div class="color-row">
-        <label for="bgColor">Pick a color:</label>
-        <input id="bgColor" type="color" value="#ffb6d9" />
+        <label for="bgColor"><strong>Pick a color:</strong></label>
+        <input id="bgColor" type="color" value="#defaf0"/>
         <button class="chip subtle" data-preset="#ffe0f0">Soft Pink</button>
         <button class="chip subtle" data-preset="#f9e6ff">Lilac</button>
         <button class="chip subtle" data-preset="#e6fff5">Mint</button>
         <button class="chip subtle" data-preset="#fff6e0">Peach</button>
-        <button class="chip subtle" data-preset="#1e1e2e">Midnight</button>
+        <button class="chip subtle" data-preset="#1e1e2e" data-accent="#0ea5e9">Midnight</button>
       </div>
     </div>
 
-    <!-- Apply + Reset -->
     <div class="apply">
       <span id="error" class="error" role="alert">Players must use different symbols.</span>
-      <button id="apply">Apply Settings</button>
-      <button id="reset" class="subtle">Restart Game</button>
+      <button id="apply" class="btn">Apply Settings</button>
+      <button id="reset" class="btn ghost">Restart Game</button>
     </div>
   </section>
 
-  <!-- Board -->
-  <div class="game-container" id="board" role="grid" aria-label="Tic Tac Toe Board">
-    <div class="cell" data-index="0" role="gridcell" aria-label="Cell 1"></div>
-    <div class="cell" data-index="1" role="gridcell" aria-label="Cell 2"></div>
-    <div class="cell" data-index="2" role="gridcell" aria-label="Cell 3"></div>
-    <div class="cell" data-index="3" role="gridcell" aria-label="Cell 4"></div>
-    <div class="cell" data-index="4" role="gridcell" aria-label="Cell 5"></div>
-    <div class="cell" data-index="5" role="gridcell" aria-label="Cell 6"></div>
-    <div class="cell" data-index="6" role="gridcell" aria-label="Cell 7"></div>
-    <div class="cell" data-index="7" role="gridcell" aria-label="Cell 8"></div>
-    <div class="cell" data-index="8" role="gridcell" aria-label="Cell 9"></div>
+  <!-- ===== Board ===== -->
+  <div class="stage">
+    <div class="game" id="board" role="grid" aria-label="Tic Tac Toe Board">
+      <div class="cell" data-index="0" role="gridcell" aria-label="Cell 1"></div>
+      <div class="cell" data-index="1" role="gridcell" aria-label="Cell 2"></div>
+      <div class="cell" data-index="2" role="gridcell" aria-label="Cell 3"></div>
+      <div class="cell" data-index="3" role="gridcell" aria-label="Cell 4"></div>
+      <div class="cell" data-index="4" role="gridcell" aria-label="Cell 5"></div>
+      <div class="cell" data-index="5" role="gridcell" aria-label="Cell 6"></div>
+      <div class="cell" data-index="6" role="gridcell" aria-label="Cell 7"></div>
+      <div class="cell" data-index="7" role="gridcell" aria-label="Cell 8"></div>
+      <div class="cell" data-index="8" role="gridcell" aria-label="Cell 9"></div>
+    </div>
+    <!-- Strike overlay will be injected here -->
   </div>
 
-  <div id="status">Player 😄's turn</div>
+  <div id="status" class="status">Turn: <span class="badge" id="turnBadge">😄</span></div>
+  <div class="confetti" id="confetti"></div>
 
   <script>
-    // --- Game State (logic uses 'X' / 'O'; display uses chosen symbols) ---
+    /* ===== Game state ===== */
     const board = Array(9).fill(null);
     let current = 'X';
     let active = true;
-
     const displaySymbol = { X: '😄', O: '♥' };
 
     const wins = [
@@ -266,132 +312,162 @@
       [0,4,8],[2,4,6],
     ];
 
+    /* ===== Elements ===== */
     const cells = document.querySelectorAll('.cell');
-    const statusText = document.getElementById('status');
+    const statusEl = document.getElementById('status');
+    const turnBadge = document.getElementById('turnBadge');
     const resetBtn = document.getElementById('reset');
     const applyBtn = document.getElementById('apply');
     const errorBox = document.getElementById('error');
-
     const p1Input = document.getElementById('p1Input');
     const p2Input = document.getElementById('p2Input');
     const bgPicker = document.getElementById('bgColor');
+    const confettiRoot = document.getElementById('confetti');
+    const stage = document.querySelector('.stage');
 
-    // --- Helpers ---
-    function setStatusTurn(){
-      statusText.textContent = `Player ${displaySymbol[current]}'s turn`;
-    }
-
-    function announceWin(sym){
-      statusText.textContent = `Player ${displaySymbol[sym]} wins! 💖`;
-    }
+    function setTurnBadge(){ turnBadge.textContent = displaySymbol[current]; }
 
     function handleClick(e){
       const idx = +e.currentTarget.dataset.index;
       if (!active || board[idx]) return;
+
       board[idx] = current;
       e.currentTarget.textContent = displaySymbol[current];
+      e.currentTarget.classList.add('placed');
 
-      // Check win
-      const won = wins.some(([a,b,c]) => board[a] && board[a]===board[b] && board[a]===board[c]);
-      if (won){
+      const result = getWin();
+      if (result){
         active = false;
-        announceWin(current);
+        showStrike(result.comboIndex);
+        highlightWin(result.combo);
+        statusEl.innerHTML = `Winner: <span class="badge">${displaySymbol[current]}</span>`;
+        burstConfetti();
         return;
       }
 
       if (!board.includes(null)){
         active = false;
-        statusText.textContent = "It's a draw! 🤝";
+        statusEl.innerHTML = `It's a draw! <span class="badge">🤝</span>`;
         return;
       }
 
       current = current === 'X' ? 'O' : 'X';
-      setStatusTurn();
+      setTurnBadge();
+    }
+
+    function getWin(){
+      for (let i=0;i<wins.length;i++){
+        const [a,b,c] = wins[i];
+        if (board[a] && board[a]===board[b] && board[a]===board[c]){
+          return { combo:[a,b,c], comboIndex:i };
+        }
+      }
+      return null;
     }
 
     function resetGame(){
       board.fill(null);
-      cells.forEach(c => c.textContent = '');
-      current = 'X';
-      active = true;
-      setStatusTurn();
+      cells.forEach(c => { c.textContent = ''; c.classList.remove('win','placed'); });
+      current = 'X'; active = true; setTurnBadge();
+      removeStrike();
+      statusEl.innerHTML = `Turn: <span class="badge" id="turnBadge">${displaySymbol[current]}</span>`;
+      confettiRoot.innerHTML = '';
     }
 
-    // --- Control Panel Interactions ---
+    /* ===== Visual helpers ===== */
+    // strike mapping to helper classes for positioning/rotation
+    const strikeMap = {
+      0:'h0', 1:'h1', 2:'h2',   // horizontals
+      3:'v0', 4:'v1', 5:'v2',   // verticals
+      6:'d0', 7:'d1'            // diagonals
+    };
+    let strikeEl = null;
 
-    // Chip clicks fill corresponding input
+    function showStrike(idx){
+      removeStrike();
+      strikeEl = document.createElement('div');
+      strikeEl.className = 'strike ' + strikeMap[idx];
+      stage.appendChild(strikeEl);
+    }
+    function removeStrike(){
+      if (strikeEl){ strikeEl.remove(); strikeEl=null; }
+    }
+
+    function highlightWin(indices){
+      indices.forEach(i => cells[i].classList.add('win'));
+    }
+
+    // tiny, dependency-free emoji confetti
+    function burstConfetti(){
+      const emojis = ['✨','🎉','💖','🌟','💫','🎊','🧁','🍬'];
+      const pieces = 24;
+      for (let i=0;i<pieces;i++){
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        span.style.left = Math.random()*100 + 'vw';
+        span.style.animationDuration = (0.9 + Math.random()*0.8) + 's';
+        span.style.transform = `translateY(-10px) rotate(${Math.random()*360}deg)`;
+        confettiRoot.appendChild(span);
+        // cleanup
+        setTimeout(()=> span.remove(), 2000);
+      }
+    }
+
+    /* ===== Panel interactions ===== */
+    // chips to input
     document.querySelectorAll('.chipset').forEach(set => {
-      const targetId = set.getAttribute('data-target');
-      const target = document.getElementById(targetId);
-      set.addEventListener('click', (evt) => {
-        if (evt.target.classList.contains('chip')){
-          target.value = evt.target.textContent.trim();
-          Array.from(set.children).forEach(ch => ch.classList.toggle('active', ch === evt.target));
-        }
+      const target = document.getElementById(set.getAttribute('data-target'));
+      set.addEventListener('click', e => {
+        if (!e.target.classList.contains('chip')) return;
+        target.value = e.target.textContent.trim();
+        [...set.children].forEach(ch => ch.classList.toggle('active', ch===e.target));
       });
     });
 
-    // Background presets
+    // background presets
     document.querySelectorAll('.chip.subtle[data-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const color = btn.getAttribute('data-preset');
-        bgPicker.value = toHex(color);
-        applyBackground(color);
+        const base = btn.getAttribute('data-preset');
+        const accent = btn.getAttribute('data-accent') || '#ff2e8e';
+        applyBackground(base, accent);
+        bgPicker.value = toHex(base);
       });
     });
 
-    // Color picker live preview
-    bgPicker.addEventListener('input', (e) => {
-      applyBackground(e.target.value);
-    });
+    bgPicker.addEventListener('input', e => applyBackground(e.target.value));
 
-    function applyBackground(color){
-      document.body.style.setProperty('--bg', color);
+    function applyBackground(base, accent){
+      // tint the main gradient; keep second stop soft lilac for depth
+      document.documentElement.style.setProperty('--bg-1', base);
+      document.documentElement.style.setProperty('--bg-2', 'rgba(248,233,255,1)');
+      document.documentElement.style.setProperty('--hot', accent || '#ff2e8e');
     }
 
-    // Ensure hex format (for preset labels)
     function toHex(c){
       const ctx = document.createElement('canvas').getContext('2d');
-      ctx.fillStyle = c;
-      return ctx.fillStyle;
+      ctx.fillStyle = c; return ctx.fillStyle;
     }
 
-    // Apply settings (validates different symbols and updates display)
     function applySettings(){
-      const p1 = (p1Input.value || '').trim();
-      const p2 = (p2Input.value || '').trim();
-
-      // Fallbacks if empty
-      const sym1 = p1.length ? p1 : 'X';
-      const sym2 = p2.length ? p2 : 'O';
-
-      if (sym1 === sym2){
-        errorBox.style.display = 'inline-block';
-        return;
-      } else {
-        errorBox.style.display = 'none';
+      const s1 = (p1Input.value || '').trim() || 'X';
+      const s2 = (p2Input.value || '').trim() || 'O';
+      if (s1 === s2){
+        errorBox.style.display='inline-block'; return;
       }
+      errorBox.style.display='none';
+      displaySymbol.X = s1; displaySymbol.O = s2;
 
-      displaySymbol.X = sym1;
-      displaySymbol.O = sym2;
-
-      // Refresh visible marks already on board to new symbols
-      cells.forEach((cell, i) => {
-        const mark = board[i];
-        cell.textContent = mark ? displaySymbol[mark] : '';
-      });
-
-      setStatusTurn();
+      // refresh any existing marks
+      cells.forEach((cell,i)=> cell.textContent = board[i] ? displaySymbol[board[i]] : '');
+      setTurnBadge();
     }
 
-    // Wire up
-    cells.forEach(cell => cell.addEventListener('click', handleClick));
+    /* ===== Wire up ===== */
+    cells.forEach(c => c.addEventListener('click', handleClick));
     resetBtn.addEventListener('click', resetGame);
     applyBtn.addEventListener('click', applySettings);
-
-    // Initialize background from picker
-    applyBackground(bgPicker.value);
-    setStatusTurn();
+    setTurnBadge();
   </script>
 </body>
 </html>
