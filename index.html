@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tic Tac Toe – Glow Edition</title>
+  <title>Tic Tac Toe – Glow + Sound</title>
 
-  <!-- Friendly rounded font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -27,7 +26,6 @@
       margin:0;
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
-      /* layered gradient + subtle dots */
       background:
         radial-gradient(24px 24px at 20% 15%, rgba(255,255,255,.7) 0 25%, transparent 26%) 0 0 / 48px 48px,
         linear-gradient(140deg, var(--bg-1), var(--bg-2));
@@ -87,7 +85,6 @@
     }
     .chip:hover{ transform: translateY(-1px); }
     .chip.active{ outline: 2px solid var(--hot); }
-
     .subtle{ background: rgba(255,255,255,.8); }
 
     input[type="text"]{
@@ -123,13 +120,16 @@
       display:none; background:#ff6b7a; color:#fff; padding:.45rem .6rem; border-radius:10px; font-weight:600;
     }
 
-    /* ===== Board ===== */
-    .stage{
-      position:relative;
-      margin: 26px 0 10px;
-      padding: 16px;
-      border-radius: 26px;
+    /* mute toggle */
+    .toggle{
+      display:inline-flex; align-items:center; gap:8px; font-weight:700;
+      background:#fff; padding:8px 12px; border-radius:12px; box-shadow: 0 8px 20px rgba(0,0,0,.06);
+      color:#1f2836;
     }
+    .toggle input{ accent-color: var(--hot); transform: scale(1.2); }
+
+    /* ===== Board ===== */
+    .stage{ position:relative; margin: 26px 0 10px; padding: 16px; border-radius: 26px; }
 
     .game{
       display:grid;
@@ -156,14 +156,12 @@
     .cell:hover{ transform: translateY(-2px) scale(1.02); filter: saturate(1.07); }
     .cell:active{ transform: translateY(0) scale(.99); }
 
-    /* pop when placing symbol */
     .placed{ animation: pop .18s ease-out; }
     @keyframes pop{
       0%{ transform: scale(.5); opacity:.2; }
       100%{ transform: scale(1); opacity:1; }
     }
 
-    /* winning flair */
     .win{
       box-shadow:
         inset 0 10px 20px rgba(255,255,255,.55),
@@ -177,7 +175,6 @@
       to{   filter: drop-shadow(0 8px 26px rgba(46,255,176,.45)); }
     }
 
-    /* winning line overlay */
     .strike{
       position:absolute; left:0; top:0; right:0; bottom:0; pointer-events:none;
     }
@@ -191,9 +188,8 @@
       transform: translate(-50%, -50%);
       animation: draw .38s ease-out forwards;
     }
-    @keyframes draw{ to{ width: calc(100% - 32px); } } /* accounts for board padding */
+    @keyframes draw{ to{ width: calc(100% - 32px); } }
 
-    /* position helpers (we rotate the line) */
     .strike.h0::after{ transform: translate(-50%, -166%) rotate(0deg); }
     .strike.h1::after{ transform: translate(-50%, -6%) rotate(0deg); }
     .strike.h2::after{ transform: translate(-50%, 154%) rotate(0deg); }
@@ -203,7 +199,6 @@
     .strike.d0::after{ transform: translate(-50%, -50%) rotate(45deg); }
     .strike.d1::after{ transform: translate(-50%, -50%) rotate(-45deg); }
 
-    /* status pill with active player's glow */
     .status{
       margin-top: 10px;
       font-weight:800;
@@ -221,14 +216,9 @@
       box-shadow: 0 6px 16px rgba(255,46,142,.35);
     }
 
-    /* confetti container */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
-    .piece{
-      position:absolute; top:-10px; font-size: 20px; animation: fall linear forwards;
-    }
-    @keyframes fall{
-      to{ transform: translateY(110vh) rotate(360deg); opacity:.9; }
-    }
+    .piece{ position:absolute; top:-10px; font-size: 20px; animation: fall linear forwards; }
+    @keyframes fall{ to{ transform: translateY(110vh) rotate(360deg); opacity:.9; } }
   </style>
 </head>
 <body>
@@ -274,6 +264,10 @@
     </div>
 
     <div class="apply">
+      <label class="toggle" title="Toggle all game sounds">
+        <input type="checkbox" id="muteToggle"/>
+        <span>Mute</span>
+      </label>
       <span id="error" class="error" role="alert">Players must use different symbols.</span>
       <button id="apply" class="btn">Apply Settings</button>
       <button id="reset" class="btn ghost">Restart Game</button>
@@ -293,7 +287,6 @@
       <div class="cell" data-index="7" role="gridcell" aria-label="Cell 8"></div>
       <div class="cell" data-index="8" role="gridcell" aria-label="Cell 9"></div>
     </div>
-    <!-- Strike overlay will be injected here -->
   </div>
 
   <div id="status" class="status">Turn: <span class="badge" id="turnBadge">😄</span></div>
@@ -324,6 +317,7 @@
     const bgPicker = document.getElementById('bgColor');
     const confettiRoot = document.getElementById('confetti');
     const stage = document.querySelector('.stage');
+    const muteToggle = document.getElementById('muteToggle');
 
     function setTurnBadge(){ turnBadge.textContent = displaySymbol[current]; }
 
@@ -334,6 +328,7 @@
       board[idx] = current;
       e.currentTarget.textContent = displaySymbol[current];
       e.currentTarget.classList.add('placed');
+      sfx.click();
 
       const result = getWin();
       if (result){
@@ -341,6 +336,7 @@
         showStrike(result.comboIndex);
         highlightWin(result.combo);
         statusEl.innerHTML = `Winner: <span class="badge">${displaySymbol[current]}</span>`;
+        sfx.win();
         burstConfetti();
         return;
       }
@@ -348,6 +344,7 @@
       if (!board.includes(null)){
         active = false;
         statusEl.innerHTML = `It's a draw! <span class="badge">🤝</span>`;
+        sfx.draw();
         return;
       }
 
@@ -372,15 +369,11 @@
       removeStrike();
       statusEl.innerHTML = `Turn: <span class="badge" id="turnBadge">${displaySymbol[current]}</span>`;
       confettiRoot.innerHTML = '';
+      sfx.click(0.6); // gentle confirm
     }
 
     /* ===== Visual helpers ===== */
-    // strike mapping to helper classes for positioning/rotation
-    const strikeMap = {
-      0:'h0', 1:'h1', 2:'h2',   // horizontals
-      3:'v0', 4:'v1', 5:'v2',   // verticals
-      6:'d0', 7:'d1'            // diagonals
-    };
+    const strikeMap = { 0:'h0',1:'h1',2:'h2', 3:'v0',4:'v1',5:'v2', 6:'d0',7:'d1' };
     let strikeEl = null;
 
     function showStrike(idx){
@@ -397,7 +390,6 @@
       indices.forEach(i => cells[i].classList.add('win'));
     }
 
-    // tiny, dependency-free emoji confetti
     function burstConfetti(){
       const emojis = ['✨','🎉','💖','🌟','💫','🎊','🧁','🍬'];
       const pieces = 24;
@@ -409,13 +401,11 @@
         span.style.animationDuration = (0.9 + Math.random()*0.8) + 's';
         span.style.transform = `translateY(-10px) rotate(${Math.random()*360}deg)`;
         confettiRoot.appendChild(span);
-        // cleanup
         setTimeout(()=> span.remove(), 2000);
       }
     }
 
     /* ===== Panel interactions ===== */
-    // chips to input
     document.querySelectorAll('.chipset').forEach(set => {
       const target = document.getElementById(set.getAttribute('data-target'));
       set.addEventListener('click', e => {
@@ -425,7 +415,6 @@
       });
     });
 
-    // background presets
     document.querySelectorAll('.chip.subtle[data-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
         const base = btn.getAttribute('data-preset');
@@ -438,7 +427,6 @@
     bgPicker.addEventListener('input', e => applyBackground(e.target.value));
 
     function applyBackground(base, accent){
-      // tint the main gradient; keep second stop soft lilac for depth
       document.documentElement.style.setProperty('--bg-1', base);
       document.documentElement.style.setProperty('--bg-2', 'rgba(248,233,255,1)');
       document.documentElement.style.setProperty('--hot', accent || '#ff2e8e');
@@ -458,16 +446,75 @@
       errorBox.style.display='none';
       displaySymbol.X = s1; displaySymbol.O = s2;
 
-      // refresh any existing marks
       cells.forEach((cell,i)=> cell.textContent = board[i] ? displaySymbol[board[i]] : '');
       setTurnBadge();
+      sfx.click(0.6);
     }
 
-    /* ===== Wire up ===== */
     cells.forEach(c => c.addEventListener('click', handleClick));
     resetBtn.addEventListener('click', resetGame);
     applyBtn.addEventListener('click', applySettings);
     setTurnBadge();
+
+    /* ===== Web Audio: tiny SFX synth (no files) ===== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let muted = false;
+    muteToggle.addEventListener('change', () => { muted = muteToggle.checked; });
+
+    // Generic tone
+    function tone({freq=600, dur=0.08, type='sine', gain=0.06, sweep=0}={}){
+      if (muted) return;
+      const t0 = audioCtx.currentTime + 0.01;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      if (sweep) osc.frequency.exponentialRampToValueAtTime(Math.max(40, freq * sweep), t0 + dur);
+      g.gain.setValueAtTime(gain, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(g).connect(audioCtx.destination);
+      osc.start(t0);
+      osc.stop(t0 + dur);
+    }
+
+    // Click "plop"
+    function plop(vol=1){
+      tone({freq: 700, dur:0.06, type:'sine', gain:0.08*vol, sweep:0.6});
+    }
+
+    // Win chord
+    function winChord(){
+      [[523,0.11],[659,0.13],[784,0.16]].forEach(([f,delay],i)=>{
+        setTimeout(()=>tone({freq:f, dur:0.18, type:'triangle', gain:0.07, sweep:1.0}), i*40);
+      });
+    }
+
+    // Draw noise (short burst)
+    function drawNoise(){
+      if (muted) return;
+      const t0 = audioCtx.currentTime + 0.01;
+      const bufferSize = 0.2 * audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * Math.exp(-i/bufferSize*6);
+      const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+      const g = audioCtx.createGain(); g.gain.setValueAtTime(0.06, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0+0.25);
+      noise.connect(g).connect(audioCtx.destination);
+      noise.start(t0); noise.stop(t0+0.26);
+    }
+
+    const sfx = {
+      click: (v=1)=> plop(v),
+      win:   ()=> winChord(),
+      draw:  ()=> drawNoise()
+    };
+
+    // Resume audio context on first user interaction (mobile autoplay policies)
+    ['click','touchstart','keydown'].forEach(evt=>{
+      window.addEventListener(evt, () => {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      }, {once:true, passive:true});
+    });
   </script>
 </body>
 </html>
