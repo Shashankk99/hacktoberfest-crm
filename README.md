@@ -92,8 +92,8 @@ docs/             # Screenshots & contributor info
 
 Thanks to all these wonderful humans who make Emoji Tic Tac Toe awesome! 💖
 
-<a href="https://github.com/Shashankk99/emoji-tictactoe/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Shashankk99/emoji-tictactoe" />
+<a href="https://github.com/Shashankk99/hacktoberfest-emoji-tictactoe/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Shashankk99/hacktoberfest-emoji-tictactoe" />
 </a>
 
 > 👆 This image updates automatically as new contributors join!
