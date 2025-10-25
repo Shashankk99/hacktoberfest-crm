@@ -1,169 +1,397 @@
-<!DOCTYPE html> <!-- tells the browser this is an HTML5 document -->
-<html lang="en"> <!-- starts the HTML and says language is English -->
-<head> <!-- this is where page settings go -->
-    <meta charset="UTF-8"> <!-- ensures text displays correctly -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- makes it mobile-friendly -->
-    <title>Tic Tac Toe - Pink & Hearts Edition</title> <!-- title seen on browser tab -->
-    <style> /* start of CSS that changes how things look */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe – Custom Play</title>
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0; padding:0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
 
-        * { /* reset spaces and set default font */
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-        }
+    body{
+      --bg:#ffb6d9;
+      --hot:#ff2e8e;
+      --tile:#ff7bbf;
+      --tile-hover:#ff4aa4;
+      background: var(--bg);
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:1.25rem;
+      padding:2rem 1rem 3rem;
+      transition: background .2s ease;
+    }
 
-        body { /* main background styling */
-            background: #ffb6d9; /* soft pink background */
-            color: #fff; /* white text */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* full height */
-            text-align: center;
-            padding: 2em;
-        }
+    h1{
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--hot);
+      text-shadow: 2px 2px 6px rgba(0,0,0,.3);
+    }
 
-        h1 { /* title styling */
-            font-size: 3em;
-            margin-bottom: 0.5em;
-            color: #ff2e8e; /* hot pink */
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-        }
+    /* Control Panel */
+    .panel{
+      width:min(900px, 100%);
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 18px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .75rem;
+    }
+    @media (min-width: 720px){
+      .panel{
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: end;
+      }
+    }
 
-        .game-container { /* tic tac toe grid */
-            display: grid;
-            grid-template-columns: repeat(3, 110px);
-            grid-template-rows: repeat(3, 110px);
-            gap: 12px;
-            margin-top: 2em;
-        }
+    .group{
+      background: rgba(0,0,0,.08);
+      border-radius: 14px;
+      padding: .9rem;
+      display:flex;
+      flex-direction:column;
+      gap:.5rem;
+    }
 
-        .cell {
-            background: #ff7bbf; /* pink squares */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3em; /* big emoji */
-            cursor: pointer;
-            border-radius: 20px;
-            transition: background 0.3s, transform 0.2s;
-        }
+    .group h3{
+      font-size: .95rem;
+      font-weight: 700;
+      color:#fff;
+      opacity:.95;
+      display:flex; align-items:center; gap:.5rem;
+    }
 
-        .cell:hover {
-            background: #ff4aa4;
-            transform: scale(1.05);
-        }
+    .row{
+      display:flex;
+      gap:.5rem;
+      align-items:center;
+      flex-wrap:wrap;
+    }
 
-        #status {
-            margin-top: 2em;
-            font-size: 1.5em;
-            color: #ffffff;
-        }
+    label{
+      font-size:.9rem;
+      opacity:.9;
+    }
 
-        button {
-            margin-top: 1.5em;
-            padding: 0.8em 1.5em;
-            font-size: 1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            background-color: #ff2e8e;
-            color: #fff;
-            transition: transform 0.2s;
-        }
+    input[type="text"], select{
+      width: 100%;
+      max-width: 240px;
+      background:#fff;
+      color:#333;
+      border:none;
+      border-radius: 12px;
+      padding:.6rem .8rem;
+      font-size:1rem;
+      outline:none;
+    }
 
-        button:hover {
-            transform: scale(1.05);
-        }
+    .chipset{
+      display:flex; gap:.5rem; flex-wrap:wrap;
+    }
+    .chip{
+      background:#fff;
+      color:#333;
+      border:none;
+      border-radius: 999px;
+      padding:.35rem .7rem;
+      cursor:pointer;
+      font-size:1rem;
+      line-height:1;
+      transition: transform .1s ease;
+      user-select:none;
+    }
+    .chip:hover{ transform: translateY(-1px); }
+    .chip.active{
+      outline: 2px solid var(--hot);
+    }
 
-    </style>
+    .color-row{
+      display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+    }
+    input[type="color"]{
+      width: 46px; height: 38px;
+      border:none; border-radius: 10px;
+      background:#fff; padding:0;
+      cursor:pointer;
+    }
+
+    .apply{
+      grid-column: 1 / -1;
+      display:flex; gap:.6rem; flex-wrap:wrap;
+      align-items:center; justify-content:flex-end;
+    }
+
+    button{
+      padding:.8rem 1.2rem;
+      border:none; border-radius: 14px;
+      font-weight:700; cursor:pointer;
+      background: var(--hot); color:#fff;
+      transition: transform .15s ease;
+    }
+    button:hover{ transform: translateY(-1px) scale(1.02); }
+
+    .subtle{
+      background: rgba(255,255,255,.25);
+      color:#222;
+    }
+
+    .error{
+      color:#fff; background:#ff5f74;
+      border-radius:10px; padding:.4rem .6rem;
+      font-size:.9rem;
+      display:none;
+    }
+
+    /* Board */
+    .game-container{
+      display:grid;
+      grid-template-columns: repeat(3, min(28vw, 110px));
+      grid-template-rows: repeat(3, min(28vw, 110px));
+      gap:12px;
+      margin-top:.5rem;
+    }
+
+    .cell{
+      background: var(--tile);
+      display:flex; align-items:center; justify-content:center;
+      font-size: clamp(2rem, 8vw, 3rem);
+      cursor:pointer;
+      border-radius:20px;
+      transition: background .2s, transform .12s;
+      user-select:none;
+    }
+    .cell:hover{ background: var(--tile-hover); transform: scale(1.04); }
+
+    #status{
+      margin-top: .75rem;
+      font-size: 1.25rem;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Tic Tac Toe ♥</h1>
+  <h1>Tic Tac Toe ♥</h1>
 
-    <div class="game-container" id="board">
-        <div class="cell" data-index="0"></div>
-        <div class="cell" data-index="1"></div>
-        <div class="cell" data-index="2"></div>
-        <div class="cell" data-index="3"></div>
-        <div class="cell" data-index="4"></div>
-        <div class="cell" data-index="5"></div>
-        <div class="cell" data-index="6"></div>
-        <div class="cell" data-index="7"></div>
-        <div class="cell" data-index="8"></div>
+  <!-- Control Panel -->
+  <section class="panel" id="controlPanel" aria-label="Control Panel">
+    <!-- Player 1 -->
+    <div class="group" id="p1Group">
+      <h3>Player 1 Symbol</h3>
+      <div class="row">
+        <label for="p1Input">Pick ANY emoji/character, or tap a chip:</label>
+      </div>
+      <div class="chipset" data-target="p1Input">
+        <button class="chip">😄</button>
+        <button class="chip">🐱</button>
+        <button class="chip">🍀</button>
+        <button class="chip">⭐</button>
+        <button class="chip">X</button>
+      </div>
+      <input id="p1Input" type="text" maxlength="2" value="😄" aria-label="Player 1 Symbol"/>
     </div>
 
-    <div id="status">Player 😄's turn</div> <!-- updated to smiley -->
+    <!-- Player 2 -->
+    <div class="group" id="p2Group">
+      <h3>Player 2 Symbol</h3>
+      <div class="row">
+        <label for="p2Input">Pick ANY emoji/character, or tap a chip:</label>
+      </div>
+      <div class="chipset" data-target="p2Input">
+        <button class="chip">♥</button>
+        <button class="chip">🐶</button>
+        <button class="chip">🍎</button>
+        <button class="chip">🌙</button>
+        <button class="chip">O</button>
+      </div>
+      <input id="p2Input" type="text" maxlength="2" value="♥" aria-label="Player 2 Symbol"/>
+    </div>
 
-    <button id="reset">Restart Game</button>
+    <!-- Background -->
+    <div class="group">
+      <h3>Background</h3>
+      <div class="color-row">
+        <label for="bgColor">Pick a color:</label>
+        <input id="bgColor" type="color" value="#ffb6d9" />
+        <button class="chip subtle" data-preset="#ffe0f0">Soft Pink</button>
+        <button class="chip subtle" data-preset="#f9e6ff">Lilac</button>
+        <button class="chip subtle" data-preset="#e6fff5">Mint</button>
+        <button class="chip subtle" data-preset="#fff6e0">Peach</button>
+        <button class="chip subtle" data-preset="#1e1e2e">Midnight</button>
+      </div>
+    </div>
 
-    <script>
-        const board = Array(9).fill(null); // stores the 9 cells (😄, ♥, or empty)
-        let currentPlayer = 'X'; // we internally still use X/O for logic
-        let gameActive = true;
+    <!-- Apply + Reset -->
+    <div class="apply">
+      <span id="error" class="error" role="alert">Players must use different symbols.</span>
+      <button id="apply">Apply Settings</button>
+      <button id="reset" class="subtle">Restart Game</button>
+    </div>
+  </section>
 
-        const winningCombos = [
-            [0,1,2], [3,4,5], [6,7,8],
-            [0,3,6], [1,4,7], [2,5,8],
-            [0,4,8], [2,4,6]
-        ];
+  <!-- Board -->
+  <div class="game-container" id="board" role="grid" aria-label="Tic Tac Toe Board">
+    <div class="cell" data-index="0" role="gridcell" aria-label="Cell 1"></div>
+    <div class="cell" data-index="1" role="gridcell" aria-label="Cell 2"></div>
+    <div class="cell" data-index="2" role="gridcell" aria-label="Cell 3"></div>
+    <div class="cell" data-index="3" role="gridcell" aria-label="Cell 4"></div>
+    <div class="cell" data-index="4" role="gridcell" aria-label="Cell 5"></div>
+    <div class="cell" data-index="5" role="gridcell" aria-label="Cell 6"></div>
+    <div class="cell" data-index="6" role="gridcell" aria-label="Cell 7"></div>
+    <div class="cell" data-index="7" role="gridcell" aria-label="Cell 8"></div>
+    <div class="cell" data-index="8" role="gridcell" aria-label="Cell 9"></div>
+  </div>
 
-        const cells = document.querySelectorAll('.cell');
-        const statusText = document.getElementById('status');
-        const resetButton = document.getElementById('reset');
+  <div id="status">Player 😄's turn</div>
 
-        function handleCellClick(e) {
-            const index = e.target.getAttribute('data-index');
-            if (board[index] || !gameActive) return;
+  <script>
+    // --- Game State (logic uses 'X' / 'O'; display uses chosen symbols) ---
+    const board = Array(9).fill(null);
+    let current = 'X';
+    let active = true;
 
-            // 😄 instead of X, ♥ instead of O
-            board[index] = currentPlayer === 'X' ? '😄' : '♥';
-            e.target.textContent = board[index];
-            checkResult();
+    const displaySymbol = { X: '😄', O: '♥' };
+
+    const wins = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6],
+    ];
+
+    const cells = document.querySelectorAll('.cell');
+    const statusText = document.getElementById('status');
+    const resetBtn = document.getElementById('reset');
+    const applyBtn = document.getElementById('apply');
+    const errorBox = document.getElementById('error');
+
+    const p1Input = document.getElementById('p1Input');
+    const p2Input = document.getElementById('p2Input');
+    const bgPicker = document.getElementById('bgColor');
+
+    // --- Helpers ---
+    function setStatusTurn(){
+      statusText.textContent = `Player ${displaySymbol[current]}'s turn`;
+    }
+
+    function announceWin(sym){
+      statusText.textContent = `Player ${displaySymbol[sym]} wins! 💖`;
+    }
+
+    function handleClick(e){
+      const idx = +e.currentTarget.dataset.index;
+      if (!active || board[idx]) return;
+      board[idx] = current;
+      e.currentTarget.textContent = displaySymbol[current];
+
+      // Check win
+      const won = wins.some(([a,b,c]) => board[a] && board[a]===board[b] && board[a]===board[c]);
+      if (won){
+        active = false;
+        announceWin(current);
+        return;
+      }
+
+      if (!board.includes(null)){
+        active = false;
+        statusText.textContent = "It's a draw! 🤝";
+        return;
+      }
+
+      current = current === 'X' ? 'O' : 'X';
+      setStatusTurn();
+    }
+
+    function resetGame(){
+      board.fill(null);
+      cells.forEach(c => c.textContent = '');
+      current = 'X';
+      active = true;
+      setStatusTurn();
+    }
+
+    // --- Control Panel Interactions ---
+
+    // Chip clicks fill corresponding input
+    document.querySelectorAll('.chipset').forEach(set => {
+      const targetId = set.getAttribute('data-target');
+      const target = document.getElementById(targetId);
+      set.addEventListener('click', (evt) => {
+        if (evt.target.classList.contains('chip')){
+          target.value = evt.target.textContent.trim();
+          Array.from(set.children).forEach(ch => ch.classList.toggle('active', ch === evt.target));
         }
+      });
+    });
 
-        function checkResult() {
-            let roundWon = false;
+    // Background presets
+    document.querySelectorAll('.chip.subtle[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const color = btn.getAttribute('data-preset');
+        bgPicker.value = toHex(color);
+        applyBackground(color);
+      });
+    });
 
-            for (let combo of winningCombos) {
-                const [a, b, c] = combo;
-                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    roundWon = true;
-                    break;
-                }
-            }
+    // Color picker live preview
+    bgPicker.addEventListener('input', (e) => {
+      applyBackground(e.target.value);
+    });
 
-            if (roundWon) {
-                statusText.textContent = `Player ${currentPlayer === 'X' ? '😄' : '♥'} wins! 💖`;
-                gameActive = false;
-                return;
-            }
+    function applyBackground(color){
+      document.body.style.setProperty('--bg', color);
+    }
 
-            if (!board.includes(null)) {
-                statusText.textContent = "It's a draw! 🤝";
-                gameActive = false;
-                return;
-            }
+    // Ensure hex format (for preset labels)
+    function toHex(c){
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = c;
+      return ctx.fillStyle;
+    }
 
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            statusText.textContent = `Player ${currentPlayer === 'X' ? '😄' : '♥'}'s turn`;
-        }
+    // Apply settings (validates different symbols and updates display)
+    function applySettings(){
+      const p1 = (p1Input.value || '').trim();
+      const p2 = (p2Input.value || '').trim();
 
-        function resetGame() {
-            board.fill(null);
-            cells.forEach(cell => cell.textContent = '');
-            currentPlayer = 'X';
-            gameActive = true;
-            statusText.textContent = `Player 😄's turn`;
-        }
+      // Fallbacks if empty
+      const sym1 = p1.length ? p1 : 'X';
+      const sym2 = p2.length ? p2 : 'O';
 
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-        resetButton.addEventListener('click', resetGame);
-    </script>
+      if (sym1 === sym2){
+        errorBox.style.display = 'inline-block';
+        return;
+      } else {
+        errorBox.style.display = 'none';
+      }
 
+      displaySymbol.X = sym1;
+      displaySymbol.O = sym2;
+
+      // Refresh visible marks already on board to new symbols
+      cells.forEach((cell, i) => {
+        const mark = board[i];
+        cell.textContent = mark ? displaySymbol[mark] : '';
+      });
+
+      setStatusTurn();
+    }
+
+    // Wire up
+    cells.forEach(cell => cell.addEventListener('click', handleClick));
+    resetBtn.addEventListener('click', resetGame);
+    applyBtn.addEventListener('click', applySettings);
+
+    // Initialize background from picker
+    applyBackground(bgPicker.value);
+    setStatusTurn();
+  </script>
 </body>
 </html>
